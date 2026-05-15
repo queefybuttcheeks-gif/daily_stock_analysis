@@ -211,6 +211,7 @@ class ExtensionRuntimeTestCase(unittest.TestCase):
 
     def test_dry_run_validates_without_invoking_handler(self):
         calls = []
+        task_runner = StubTaskRunner()
 
         def side_effecting(payload, context):
             calls.append(payload)
@@ -222,9 +223,10 @@ class ExtensionRuntimeTestCase(unittest.TestCase):
             "Confirmed",
             side_effecting,
             input_schema={"type": "object", "required": ["symbol"]},
+            mode=ActionMode.ASYNC,
             requires_confirmation=True,
         )
-        result = self._runtime(action).execute_action(
+        result = self._runtime(action, task_runner=task_runner).execute_action(
             "test.confirmed",
             {"symbol": "600519"},
             {"dry_run": "true"},
@@ -233,6 +235,7 @@ class ExtensionRuntimeTestCase(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.data, {"status": "validated", "dry_run": True})
         self.assertEqual(calls, [])
+        self.assertEqual(task_runner.calls, [])
 
     def test_async_submission_failure_returns_structured_error(self):
         class FailingTaskRunner:
