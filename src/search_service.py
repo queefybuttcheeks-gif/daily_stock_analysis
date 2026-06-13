@@ -2201,10 +2201,15 @@ class SearchService:
         re.IGNORECASE,
     )
     _BUSINESS_APP_METRIC_RE = re.compile(
-        r"(?:(?:下载量|安装量|装机量).{0,12}(?:增长|同比|环比|上升|增加|提升|突破|创新高)|"
-        r"(?:增长|同比|环比|上升|增加|提升|突破|创新高).{0,12}(?:下载量|安装量|装机量)|"
-        r"\b(?:downloads?|installs?)\b.{0,16}\b(?:grew|growth|rose|increase|increased|surged)\b|"
-        r"\b(?:grew|growth|rose|increase|increased|surged)\b.{0,16}\b(?:downloads?|installs?)\b)",
+        r"(?:(?:下载量|安装量|装机量).{0,12}"
+        r"(?:增长|同比|环比|上升|增加|提升|突破|创新高|下降|下滑|减少|回落|放缓|持平|承压|低迷)|"
+        r"(?:增长|同比|环比|上升|增加|提升|突破|创新高|下降|下滑|减少|回落|放缓|持平|承压|低迷)"
+        r".{0,12}(?:下载量|安装量|装机量)|"
+        r"\b(?:downloads?|installs?)\b.{0,16}"
+        r"\b(?:grew|growth|rose|increase|increased|surged|fell|fall|declined|decline|"
+        r"decreased|dropped|drop|slowed|flat|weakened)\b|"
+        r"\b(?:grew|growth|rose|increase|increased|surged|fell|fall|declined|decline|"
+        r"decreased|dropped|drop|slowed|flat|weakened)\b.{0,16}\b(?:downloads?|installs?)\b)",
         re.IGNORECASE,
     )
     _ADULT_SERVICE_SPAM_STRONG_TERMS = (
@@ -2225,8 +2230,8 @@ class SearchService:
         re.IGNORECASE,
     )
     _ADULT_SERVICE_SPAM_CONTACT_CONTEXT_TERMS = (
-        "小姐", "上门", "预约", "同城", "按摩", "保健", "足浴", "桑拿",
-        "会所", "技师", "全套", "套餐", "包夜", "大保健", "推油",
+        "小姐", "按摩", "保健", "足浴", "桑拿", "会所", "技师",
+        "全套", "包夜", "大保健", "推油",
         "约炮", "援交", "成人", "色情",
     )
 

@@ -742,6 +742,43 @@ class SearchNewsFreshnessTestCase(unittest.TestCase):
         )
         self.assertEqual(resp.results[0].relevance_category, "direct_company_news")
 
+    def test_app_download_decline_metrics_do_not_trigger_download_filter(self) -> None:
+        """Negative app download/install metrics are also business news."""
+        fresh = datetime.now().date().isoformat()
+        service, _ = self._create_service_with_mock_provider(
+            news_max_age_days=3,
+            news_strategy_profile="short",
+            response=_response(
+                [
+                    _result(
+                        "拼多多 PDD Temu 应用下载量下降",
+                        fresh,
+                        snippet="Temu 应用安装量下滑，市场关注获客效率。",
+                        url="https://finance.example.invalid/app/news/pdd-downloads-fall",
+                        source="finance.example.invalid",
+                    ),
+                    _result(
+                        "PDD app installs fell after campaign pullback",
+                        fresh,
+                        snippet="PDD shares moved as app installs fell in May.",
+                        url="https://finance.example.invalid/apps/pdd-installs",
+                        source="finance.example.invalid",
+                    ),
+                ]
+            ),
+        )
+
+        resp = service.search_stock_news("PDD", "PDD Holdings", max_results=2)
+
+        self.assertEqual(
+            [item.title for item in resp.results],
+            [
+                "拼多多 PDD Temu 应用下载量下降",
+                "PDD app installs fell after campaign pullback",
+            ],
+        )
+        self.assertTrue(all(item.relevance_category == "direct_company_news" for item in resp.results))
+
     def test_url_backed_app_rating_listing_is_filtered(self) -> None:
         """App-store URL plus version/rating metrics should be treated as listing noise."""
         fresh = datetime.now().date().isoformat()
@@ -859,9 +896,9 @@ class SearchNewsFreshnessTestCase(unittest.TestCase):
             response=_response(
                 [
                     _result(
-                        "腾讯控股 00700 发布 QQ2024 新功能",
+                        "腾讯控股 00700 QQ2024 开放预约",
                         fresh,
-                        snippet="QQ2024 产品升级，企业通信功能增强。",
+                        snippet="QQ2024 产品升级开放预约，企业通信功能增强。",
                         url="https://finance.example.invalid/products/QQ2024",
                         source="finance.example.invalid",
                     )
@@ -873,7 +910,7 @@ class SearchNewsFreshnessTestCase(unittest.TestCase):
 
         self.assertEqual(
             [item.title for item in resp.results],
-            ["腾讯控股 00700 发布 QQ2024 新功能"],
+            ["腾讯控股 00700 QQ2024 开放预约"],
         )
         self.assertEqual(resp.results[0].relevance_category, "direct_company_news")
 
